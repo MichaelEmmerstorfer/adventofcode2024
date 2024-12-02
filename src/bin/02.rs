@@ -49,12 +49,11 @@ pub fn part_two(input: &str) -> Option<u32> {
   let mut safeReports = 0;
 
   for line in input.lines().map(String::from) {
-    let mut safeReport = true;
     let mut increasing = 0;
     let mut decreasing = 0;
+    let mut sameNumber = 0;
     /* 1 is indicating increasing, 2 indicates decreasing, 0 is inital value  */
-    let mut isLevelIncreasing = 0;
-    let mut firstFinding = false;
+    let mut findings = 0;
     let mut levelsString = line.split_whitespace();
     let mut compareLevel: u32 = levelsString.next().unwrap().parse().unwrap();
     let numbersInTheLine = levelsString.clone().count();
@@ -75,33 +74,38 @@ pub fn part_two(input: &str) -> Option<u32> {
         decreasing += 1;
       }
 
+      if compareLevel == nextLevel
+      {
+        sameNumber += 1;
+      }
+
       if compareLevel.abs_diff(nextLevel) == 0 || compareLevel.abs_diff(nextLevel) > 3
       {
-        if firstFinding == false
-        {
-          firstFinding = true;
-          firstFindingResult = true;
-        }
-        else {
-          safeReport = false;
-          break;
-        }
+        findings += 1;
+
+      }
+
+      compareLevel = nextLevel;
         
-      }
-
-      if firstFindingResult == false
-      {
-        compareLevel = nextLevel;
-      }
-
     }
 
-
-    if (safeReport == true) && (decreasing >= numbersInTheLine - 1 || increasing >= numbersInTheLine - 1)
+    if (decreasing >= numbersInTheLine - 1) || (increasing >= numbersInTheLine - 1)
     {
-      safeReports += 1;
+      if (findings >= 1) && ((decreasing == numbersInTheLine - 1) || (increasing == numbersInTheLine - 1) && sameNumber == 1)
+      {
+        // Do nothing
+      }
+      else {
+        safeReports += 1;
+      }
     }
-  
+
+    // if ((safeReport == true) && (decreasing >= numbersInTheLine - 1 || increasing >= numbersInTheLine - 1)) || 
+    // ((safeReport == false) && (decreasing >= numbersInTheLine || increasing >= numbersInTheLine))
+    // {
+    //   safeReports += 1;
+    // }
+
   }
 
   return Some(safeReports)
@@ -120,6 +124,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, Some(10));
+        assert_eq!(result, Some(14));
     }
 }

@@ -50,15 +50,16 @@ pub fn part_two(input: &str) -> Option<u32> {
 
   for line in input.lines().map(String::from) {
     let mut safeReport = true;
-    let mut increasing = false;
-    let mut decreasing = false;
+    let mut increasing = 0;
+    let mut decreasing = 0;
     /* 1 is indicating increasing, 2 indicates decreasing, 0 is inital value  */
     let mut isLevelIncreasing = 0;
     let mut firstFinding = false;
     let mut levelsString = line.split_whitespace();
     let mut compareLevel: u32 = levelsString.next().unwrap().parse().unwrap();
+    let numbersInTheLine = levelsString.clone().count();
 
-    for n in 0..levelsString.clone().count()
+    for n in 0..numbersInTheLine
     {
       let mut firstFindingResult = false;
       let nextLevel: u32 = levelsString.next().unwrap().parse().unwrap();
@@ -66,38 +67,20 @@ pub fn part_two(input: &str) -> Option<u32> {
       /* Decide whether list is increasing or decreasing */
       if compareLevel < nextLevel
       {
-        increasing = true;
-
-        if isLevelIncreasing == 0
-        {
-          isLevelIncreasing = 1;
-        }
+        increasing += 1;
       }
 
       if compareLevel > nextLevel
       {
-        decreasing = true;
-
-        if isLevelIncreasing == 0
-        {
-          isLevelIncreasing = 2;
-        }
+        decreasing += 1;
       }
 
-      if (compareLevel.abs_diff(nextLevel) == 0 || compareLevel.abs_diff(nextLevel) > 3) || (decreasing == true && increasing == true)
+      if compareLevel.abs_diff(nextLevel) == 0 || compareLevel.abs_diff(nextLevel) > 3
       {
         if firstFinding == false
         {
           firstFinding = true;
           firstFindingResult = true;
-
-          if isLevelIncreasing == 1 {
-            decreasing = false;
-          }
-          else if isLevelIncreasing == 2 {
-            increasing = false;
-          }
-
         }
         else {
           safeReport = false;
@@ -113,7 +96,8 @@ pub fn part_two(input: &str) -> Option<u32> {
 
     }
 
-    if safeReport == true
+
+    if (safeReport == true) && (decreasing >= numbersInTheLine - 1 || increasing >= numbersInTheLine - 1)
     {
       safeReports += 1;
     }
@@ -136,6 +120,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, Some(4));
+        assert_eq!(result, Some(10));
     }
 }
